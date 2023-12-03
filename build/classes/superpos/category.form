@@ -128,6 +128,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Category"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabelCategoryMouseClicked"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelBrand">
           <Properties>
@@ -142,6 +145,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Brand"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabelBrandMouseClicked"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelProduct">
           <Properties>
@@ -156,6 +162,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Product"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabelProductMouseClicked"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelExit">
           <Properties>
