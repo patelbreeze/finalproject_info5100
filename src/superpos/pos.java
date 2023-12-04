@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import java.sql.DriverManager;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -385,55 +387,72 @@ public class pos extends javax.swing.JFrame {
 
         String name = txtprocode.getText();
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-            insert = con1.prepareStatement("select * from product where barcode=?");
-            insert.setString(1, name);
-            rs = insert.executeQuery();
+        //        validation part
+        String textPATTERN = "^[a-zA-Z,0-9, t\\xA0\\u1680\\u180e\\u2000-\\u200a\\u202f\\u205f\\u3000]{1,60}$";
+        Pattern patt = Pattern.compile(textPATTERN);
 
-            while (rs.next()) {
-                int currentqty;
-                currentqty = rs.getInt("qty");
+        String numPATTERN = "^[0-9]{1,30}$";
+        Pattern pattnum = Pattern.compile(numPATTERN);
 
-                int price = Integer.parseInt(txtprice.getText());
-                int qtynew = Integer.parseInt(txtqty.getText());
+        Matcher match = patt.matcher(txtproname.getText());
 
-                int tot = price * qtynew;
+        Matcher match1 = pattnum.matcher(txtprocode.getText());
+        Matcher match2 = pattnum.matcher(txtqty.getText());
+        Matcher match3 = pattnum.matcher(txtprice.getText());
 
-                if (qtynew >= currentqty) {
-                    JOptionPane.showMessageDialog(this, "Available Product" + "=" + currentqty);
-                    JOptionPane.showMessageDialog(this, "Quantity is not Enough");
+        if (!match.matches() || !match1.matches() || !match2.matches() || !match3.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter All Field correctly");
+        } else {
 
-                } else {
-                    model = (DefaultTableModel) jTable1.getModel();
-                    model.addRow(new Object[]{
-                        txtprocode.getText(),
-                        txtproname.getText(),
-                        txtprice.getText(),
-                        txtqty.getText(),
-                        tot,});
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                insert = con1.prepareStatement("select * from product where barcode=?");
+                insert.setString(1, name);
+                rs = insert.executeQuery();
 
-                    int sum = 0;
-                    for (int i = 0; i < jTable1.getRowCount(); i++) {
-                        sum = sum + Integer.parseInt(jTable1.getValueAt(i, 4).toString());
+                while (rs.next()) {
+                    int currentqty;
+                    currentqty = rs.getInt("qty");
+
+                    int price = Integer.parseInt(txtprice.getText());
+                    int qtynew = Integer.parseInt(txtqty.getText());
+
+                    int tot = price * qtynew;
+
+                    if (qtynew >= currentqty) {
+                        JOptionPane.showMessageDialog(this, "Available Product" + "=" + currentqty);
+                        JOptionPane.showMessageDialog(this, "Quantity is not Enough");
+
+                    } else {
+                        model = (DefaultTableModel) jTable1.getModel();
+                        model.addRow(new Object[]{
+                            txtprocode.getText(),
+                            txtproname.getText(),
+                            txtprice.getText(),
+                            txtqty.getText(),
+                            tot,});
+
+                        int sum = 0;
+                        for (int i = 0; i < jTable1.getRowCount(); i++) {
+                            sum = sum + Integer.parseInt(jTable1.getValueAt(i, 4).toString());
+                        }
+                        txtsub.setText(Integer.toString(sum));
                     }
-                    txtsub.setText(Integer.toString(sum));
+
+                    txtprocode.setText("");
+                    txtproname.setText("");
+                    txtprice.setText("");
+                    txtqty.setText("");
+
                 }
 
-                txtprocode.setText("");
-                txtproname.setText("");
-                txtprice.setText("");
-                txtqty.setText("");
-
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(pos.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(pos.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(pos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(pos.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
     private void jButtonCategoryAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryAddActionPerformed
 
@@ -504,7 +523,7 @@ public class pos extends javax.swing.JFrame {
     private void sales() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         LocalDateTime now = LocalDateTime.now();
-        
+
         String date = dtf.format(now);
         String subtot = txtsub.getText();
         String pay = txtpay.getText();
@@ -553,12 +572,10 @@ public class pos extends javax.swing.JFrame {
                 insert.executeUpdate();
 
             }
-            
-            
-            
-             String query3 = "update product set qty= qty -? where barcode=?";
+
+            String query3 = "update product set qty= qty -? where barcode=?";
             insert = con1.prepareStatement(query3);
-            
+
             for (int i = 0; i < jTable1.getRowCount(); i++) {
 
                 product_id = (String) jTable1.getValueAt(i, 0);
@@ -570,15 +587,6 @@ public class pos extends javax.swing.JFrame {
                 insert.execute();
 
             }
-            
-            
-            
-            
-            
-            
-            
-            
-            
 
             insert.addBatch();
             JOptionPane.showMessageDialog(this, "Record Saved");
@@ -590,33 +598,47 @@ public class pos extends javax.swing.JFrame {
         }
 
     }
-    
-    
-    
-    
-    public void print()
-    {
-     String sub = txtsub.getText();
-     String pay = txtpay.getText();
-     String bal = txtbal.getText();
-     
-        try { 
-            new print(sub,pay,bal,jTable1.getModel()).setVisible(true);
+
+    public void print() {
+        String sub = txtsub.getText();
+        String pay = txtpay.getText();
+        String bal = txtbal.getText();
+
+        try {
+            
+            new print(sub, pay, bal, jTable1.getModel()).setVisible(true);
         } catch (PrinterException ex) {
             Logger.getLogger(pos.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        int pay = Integer.parseInt(txtpay.getText());
-        int subtotal = Integer.parseInt(txtsub.getText());
-        int bal = pay - subtotal;
-         txtbal.setText(String.valueOf(bal));
-         print();
-         sales();
+        //        validation part
+        String numPATTERN = "^[0-9]{1,60}$";
+        Pattern pattnum = Pattern.compile(numPATTERN);
 
+        Matcher match4 = pattnum.matcher(txtpay.getText());
 
+        if (!match4.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter Amount correctly");
+        } else {
+
+            int pay = Integer.parseInt(txtpay.getText());
+            int subtotal = Integer.parseInt(txtsub.getText());
+            int bal = pay - subtotal;
+
+            if (subtotal <= pay) {
+                txtbal.setText(String.valueOf(bal));
+                print();
+                sales();
+            } else {
+                JOptionPane.showMessageDialog(null, "You have entered less amount then payable amount");
+
+            }
+
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jLabelCashierMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelCashierMouseClicked

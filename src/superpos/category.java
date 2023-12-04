@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.DriverManager;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -87,6 +89,7 @@ public class category extends javax.swing.JFrame {
         jButtonCategoryAdd = new javax.swing.JButton();
         jButtonCategoryEdit = new javax.swing.JButton();
         jButtonCategoryDelete = new javax.swing.JButton();
+        errorField = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -205,6 +208,11 @@ public class category extends javax.swing.JFrame {
                 txtCategoryActionPerformed(evt);
             }
         });
+        txtCategory.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCategoryKeyReleased(evt);
+            }
+        });
 
         txtStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Active", "Deactive" }));
 
@@ -229,6 +237,9 @@ public class category extends javax.swing.JFrame {
             }
         });
 
+        errorField.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        errorField.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -245,13 +256,17 @@ public class category extends javax.swing.JFrame {
                             .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(54, 54, 54)
+                        .addGap(52, 52, 52)
                         .addComponent(jButtonCategoryAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonCategoryEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonCategoryDelete)))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(errorField, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(57, 57, 57))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -265,11 +280,13 @@ public class category extends javax.swing.JFrame {
                     .addComponent(jLabelCategoryStatus)
                     .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addComponent(errorField, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCategoryAdd)
                     .addComponent(jButtonCategoryEdit)
                     .addComponent(jButtonCategoryDelete))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -317,7 +334,7 @@ public class category extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap(12, Short.MAX_VALUE))))
         );
@@ -346,30 +363,40 @@ public class category extends javax.swing.JFrame {
 
     private void jButtonCategoryAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryAddActionPerformed
         // TODO add your handling code here:
-        String category = txtCategory.getText();
-        String status = txtStatus.getSelectedItem().toString();
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-            pst = con1.prepareStatement("insert into category (category,status) values(?,?)");
-            pst.setString(1, category);
-            pst.setString(2, status);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Category Added");
-            table_update();
-            txtCategory.setText("");
-            txtStatus.setSelectedIndex(-1);
-            txtCategory.requestFocus();
+        String textPATTERN = "^[a-zA-Z,0-9, t\\xA0\\u1680\\u180e\\u2000-\\u200a\\u202f\\u205f\\u3000]{1,60}$";
+        Pattern patt = Pattern.compile(textPATTERN);
+        Matcher match = patt.matcher(txtCategory.getText());
+        if (!match.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter All Field correctly");
+        } else {
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(category.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            String category = txtCategory.getText();
+            String status = txtStatus.getSelectedItem().toString();
 
-        } catch (SQLException ex) {
-            Logger.getLogger(category.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                pst = con1.prepareStatement("insert into category (category,status) values(?,?)");
+                pst.setString(1, category);
+                pst.setString(2, status);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Category Added");
+                table_update();
+                txtCategory.setText("");
+                txtStatus.setSelectedIndex(-1);
+                txtCategory.requestFocus();
+
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(category.class
+                        .getName()).log(Level.SEVERE, null, ex);
+
+            } catch (SQLException ex) {
+                Logger.getLogger(category.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
     }//GEN-LAST:event_jButtonCategoryAddActionPerformed
 
     private void jButtonCategoryDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryDeleteActionPerformed
@@ -386,7 +413,7 @@ public class category extends javax.swing.JFrame {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
                 pst = con1.prepareStatement("delete from category where id=?");
-                
+
                 pst.setInt(1, id);
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Category Deleted");
@@ -448,11 +475,11 @@ public class category extends javax.swing.JFrame {
 
     private void jLabelPosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelPosMouseClicked
         // TODO add your handling code here:
-        
+
         pos po = new pos();
         this.hide();
         po.setVisible(true);
-        
+
     }//GEN-LAST:event_jLabelPosMouseClicked
 
     private void jLabelExitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelExitMouseClicked
@@ -464,38 +491,50 @@ public class category extends javax.swing.JFrame {
 
     private void jButtonCategoryEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryEditActionPerformed
         // TODO add your handling code here:
+        String textPATTERN = "^[a-zA-Z,0-9, t\\xA0\\u1680\\u180e\\u2000-\\u200a\\u202f\\u205f\\u3000]{1,60}$";
+        Pattern patt = Pattern.compile(textPATTERN);
+        Matcher match = patt.matcher(txtCategory.getText());
+        if (!match.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter All Field correctly");
+        } else {
+            DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
+            int selectIndex = jTable1.getSelectedRow();
 
-        DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
-        int selectIndex = jTable1.getSelectedRow();
+            int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
 
-        int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
+            String category = txtCategory.getText();
+            String status = txtStatus.getSelectedItem().toString();
 
-        String category = txtCategory.getText();
-        String status = txtStatus.getSelectedItem().toString();
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                pst = con1.prepareStatement("update category set category=?,status=? where id=?");
+                pst.setString(1, category);
+                pst.setString(2, status);
+                pst.setInt(3, id);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Category Updated");
+                table_update();
+                txtCategory.setText("");
+                txtStatus.setSelectedIndex(-1);
+                txtCategory.requestFocus();
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-            pst = con1.prepareStatement("update category set category=?,status=? where id=?");
-            pst.setString(1, category);
-            pst.setString(2, status);
-            pst.setInt(3, id);
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Category Updated");
-            table_update();
-            txtCategory.setText("");
-            txtStatus.setSelectedIndex(-1);
-            txtCategory.requestFocus();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(category.class
+                        .getName()).log(Level.SEVERE, null, ex);
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(category.class
-                .getName()).log(Level.SEVERE, null, ex);
-
-        } catch (SQLException ex) {
-            Logger.getLogger(category.class
-                .getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(category.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jButtonCategoryEditActionPerformed
+
+    private void txtCategoryKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCategoryKeyReleased
+        // TODO add your handling code here:
+
+
+    }//GEN-LAST:event_txtCategoryKeyReleased
 
     /**
      * @param args the command line arguments
@@ -541,6 +580,7 @@ public class category extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel errorField;
     private javax.swing.JButton jButtonCategoryAdd;
     private javax.swing.JButton jButtonCategoryDelete;
     private javax.swing.JButton jButtonCategoryEdit;

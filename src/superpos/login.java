@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-
 /**
  *
  * @author Breeze
@@ -26,11 +25,10 @@ public class login extends javax.swing.JFrame {
     public login() {
         initComponents();
     }
-    
+
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,6 +49,7 @@ public class login extends javax.swing.JFrame {
         txtpass = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(138, 194, 250));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 102, 255));
@@ -162,58 +161,55 @@ public class login extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
-    
-    
-    public void login()
-    {
-        
+
+    public void login() {
+
         String username = txtuser.getText();
         String password = txtpass.getText();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
             pst = con.prepareStatement("select 8 from cashier where username =? and password =?");
-            
-            pst.setString(1,username);
-            pst.setString(2,password);
+
+            pst.setString(1, username);
+            pst.setString(2, password);
             rs = pst.executeQuery();
-            
-            if(rs.next())
-            {
-                pos a = new pos();
-                this.hide();
-                a.setVisible(true);
-            }
-            else {
-                JOptionPane.showMessageDialog(this,"UserName and Password do not Match");
+
+            if (rs.next()) {
+                if (username == "admin") {
+                    pos am = new pos();
+                    this.hide();
+                    am.setVisible(true);
+                } else {
+                    pos_cashier a = new pos_cashier();
+                    this.hide();
+                    a.setVisible(true);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "UserName and Password do not Match");
                 txtuser.setText("");
                 txtpass.setText("");
                 txtuser.requestFocus();
-                
+
             }
-            
+
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(login.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(product.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
     }
-            
+
     private void txtpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpassActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_txtpassActionPerformed
 
-    
-    
-    
-    
+
     private void txtuserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtuserActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_txtuserActionPerformed
 
     /**
@@ -245,6 +241,7 @@ public class login extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new login().setVisible(true);
             }

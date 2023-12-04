@@ -35,6 +35,7 @@ public class print extends javax.swing.JFrame {
         txtprint.setText(txtprint.getText() + "***************SuperPos******************\n");
         txtprint.setText(txtprint.getText() + "\n");
         txtprint.setText(txtprint.getText() + "product"+ "\t" + "Price" + "\t" + "Total\n");
+        txtprint.setText(txtprint.getText() + "***********************************************\n");
         
         for(int i=0; i< tableModel.getRowCount();i++)
         {
@@ -42,7 +43,7 @@ public class print extends javax.swing.JFrame {
             String price = (String) tableModel.getValueAt(i,2);
             int total = (int) tableModel.getValueAt(i,4);
             
-            txtprint.setText(txtprint.getText() + product+ "\t" + price + "\t" + total);
+            txtprint.setText(txtprint.getText() + product+ "\t" + price + "\t" + total + "\n");
         }
             txtprint.setText(txtprint.getText() + "\n");
             txtprint.setText(txtprint.getText() + "\n");
@@ -53,7 +54,7 @@ public class print extends javax.swing.JFrame {
         
         txtprint.setText(txtprint.getText() + "***************************************\n");
     txtprint.setText(txtprint.getText() + "***************************************\n");
-    txtprint.setText(txtprint.getText() + "Thank you come agian.................\n");
+    txtprint.setText(txtprint.getText() + "Thank you come again.................\n");
     
     txtprint.print();
     }
@@ -121,6 +122,7 @@ public class print extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new print().setVisible(true);
             }

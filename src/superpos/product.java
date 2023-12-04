@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.DriverManager;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -107,6 +109,7 @@ public class product extends javax.swing.JFrame {
             Logger.getLogger(product.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -301,6 +304,10 @@ public class product extends javax.swing.JFrame {
         txtdesc.setColumns(20);
         txtdesc.setRows(5);
         jScrollPane2.setViewportView(txtdesc);
+
+        txtcat.setSelectedItem(txtcat);
+
+        txtbrand.setSelectedItem(txtbrand);
 
         txtretailp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -526,153 +533,6 @@ public class product extends javax.swing.JFrame {
     }
 
 
-    private void txtproActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtproActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtproActionPerformed
-
-    private void jButtonCategoryAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryAddActionPerformed
-        // TODO add your handling code here:
-        String status = txtStatus.getSelectedItem().toString();
-        String product = txtpro.getText();
-        String desc = txtdesc.getText();
-        CategoryItem citem = (CategoryItem) txtcat.getSelectedItem();
-        BrandItem britem = (BrandItem) txtbrand.getSelectedItem();
-        String cprice = txtcostp.getText();
-        String rprice = txtretailp.getText();
-        String qty = txtqty.getText();
-        String barcode = txtbarcode.getText();
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-            pst = con1.prepareStatement("insert into product (product,description, cat_id,brand_id,cost_price,retail_price,qty,barcode,status) values(?,?,?,?,?,?,?,?,?)");
-            pst.setString(1, product);
-            pst.setString(2, desc);
-            pst.setInt(3, citem.id);
-            pst.setInt(4, britem.id);
-            pst.setString(5, cprice);
-            pst.setString(6, rprice);
-            pst.setString(7, qty);
-            pst.setString(8, barcode);
-            pst.setString(9, status);
-
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Product Added");
-            table_update();
-            txtpro.setText("");
-            txtdesc.setText("");
-            txtcat.setSelectedIndex(-1);
-            txtbrand.setSelectedIndex(-1);
-            txtqty.setText("");
-            txtcostp.setText("");
-            txtretailp.setText("");
-            txtbarcode.setText("");
-            txtStatus.setSelectedIndex(-1);
-            txtpro.requestFocus();
-
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(product.class
-                    .getName()).log(Level.SEVERE, null, ex);
-
-        } catch (SQLException ex) {
-            Logger.getLogger(product.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jButtonCategoryAddActionPerformed
-
-    private void jButtonCategoryDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryDeleteActionPerformed
-        // TODO add your handling code here:
-        DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
-        int selectIndex = jTable1.getSelectedRow();
-
-        int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
-        int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to Delete the Record", "Warning", JOptionPane.YES_NO_OPTION);
-
-        if (dialogResult == JOptionPane.YES_OPTION) {
-
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-                pst = con1.prepareStatement("delete from product where id=?");
-
-                pst.setInt(1, id);
-                pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Product Deleted");
-                table_update();
-                txtpro.setText("");
-                txtStatus.setSelectedIndex(-1);
-                txtpro.requestFocus();
-
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(product.class
-                        .getName()).log(Level.SEVERE, null, ex);
-
-            } catch (SQLException ex) {
-                Logger.getLogger(product.class
-                        .getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-    }//GEN-LAST:event_jButtonCategoryDeleteActionPerformed
-
-    private void jButtonCategoryEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryEditActionPerformed
-        // TODO add your handling code here:
-
-        DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
-        int selectIndex = jTable1.getSelectedRow();
-
-        int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
-
-        String status = txtStatus.getSelectedItem().toString();
-        String product = txtpro.getText();
-        String desc = txtdesc.getText();
-        CategoryItem citem = (CategoryItem) txtcat.getSelectedItem();
-        BrandItem britem = (BrandItem) txtbrand.getSelectedItem();
-        String cprice = txtcostp.getText();
-        String rprice = txtretailp.getText();
-        String qty = txtqty.getText();
-        String barcode = txtbarcode.getText();
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
-            pst = con1.prepareStatement("update product set product =?, description=?, cat_id=? ,brand_id=? ,cost_price=? ,retail_price=? ,qty=? ,barcode=? ,status=? where id=?");
-            pst.setString(1, product);
-            pst.setString(2, desc);
-            pst.setInt(3, citem.id);
-            pst.setInt(4, britem.id);
-            pst.setString(5, cprice);
-            pst.setString(6, rprice);
-            pst.setString(7, qty);
-            pst.setString(8, barcode);
-            pst.setString(9, status);
-            pst.setInt(10, id);
-
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Product Updated");
-            table_update();
-            txtpro.setText("");
-            txtdesc.setText("");
-            txtcat.setSelectedIndex(-1);
-            txtbrand.setSelectedIndex(-1);
-            txtqty.setText("");
-            txtcostp.setText("");
-            txtretailp.setText("");
-            txtbarcode.setText("");
-            txtStatus.setSelectedIndex(-1);
-            txtpro.requestFocus();
-
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(product.class
-                    .getName()).log(Level.SEVERE, null, ex);
-
-        } catch (SQLException ex) {
-            Logger.getLogger(product.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }//GEN-LAST:event_jButtonCategoryEditActionPerformed
-
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
 
@@ -699,10 +559,6 @@ public class product extends javax.swing.JFrame {
         p.setVisible(true);
     }//GEN-LAST:event_jLabelProductMouseClicked
 
-    private void txtretailpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtretailpActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtretailpActionPerformed
-
     private void jLabelCashierMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelCashierMouseClicked
         // TODO add your handling code here:
         cashier p = new cashier();
@@ -712,7 +568,7 @@ public class product extends javax.swing.JFrame {
 
     private void jLabelCategoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelCategoryMouseClicked
         // TODO add your handling code here:
-        
+
         category p = new category();
         this.hide();
         p.setVisible(true);
@@ -738,6 +594,210 @@ public class product extends javax.swing.JFrame {
         this.hide();
         p.setVisible(true);
     }//GEN-LAST:event_jLabelExitMouseClicked
+
+    private void txtretailpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtretailpActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtretailpActionPerformed
+
+    private void jButtonCategoryDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryDeleteActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
+        int selectIndex = jTable1.getSelectedRow();
+
+        int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to Delete the Record", "Warning", JOptionPane.YES_NO_OPTION);
+
+        if (dialogResult == JOptionPane.YES_OPTION) {
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                pst = con1.prepareStatement("delete from product where id=?");
+
+                pst.setInt(1, id);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Product Deleted");
+                table_update();
+                txtpro.setText("");
+                txtStatus.setSelectedIndex(-1);
+                txtpro.requestFocus();
+
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+            } catch (SQLException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_jButtonCategoryDeleteActionPerformed
+
+    private void jButtonCategoryEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryEditActionPerformed
+        // TODO add your handling code here:
+
+        DefaultTableModel d1 = (DefaultTableModel) jTable1.getModel();
+        int selectIndex = jTable1.getSelectedRow();
+
+        int id = Integer.parseInt(d1.getValueAt(selectIndex, 0).toString());
+
+        String status = txtStatus.getSelectedItem().toString();
+        String product = txtpro.getText();
+        String desc = txtdesc.getText();
+        CategoryItem citem = (CategoryItem) txtcat.getSelectedItem();
+        String c = txtcat.getSelectedItem().toString();
+
+        BrandItem britem = (BrandItem) txtbrand.getSelectedItem();
+        String b = txtbrand.getSelectedItem().toString();
+
+        String cprice = txtcostp.getText();
+        String rprice = txtretailp.getText();
+        String qty = txtqty.getText();
+        String barcode = txtbarcode.getText();
+
+        //        validation part
+        String textPATTERN = "^[a-zA-Z,0-9, t\\xA0\\u1680\\u180e\\u2000-\\u200a\\u202f\\u205f\\u3000]{1,60}$";
+        Pattern patt = Pattern.compile(textPATTERN);
+
+        String numPATTERN = "^[0-9]{1,30}$";
+        Pattern pattnum = Pattern.compile(numPATTERN);
+
+        Matcher match = patt.matcher(txtpro.getText());
+        Matcher match1 = patt.matcher(txtdesc.getText());
+        Matcher match2 = patt.matcher(txtcat.getSelectedItem().toString());
+        Matcher match3 = patt.matcher(txtbrand.getSelectedItem().toString());
+        Matcher match4 = patt.matcher(txtStatus.getSelectedItem().toString());
+
+        Matcher match5 = pattnum.matcher(txtcostp.getText());
+        Matcher match6 = pattnum.matcher(txtretailp.getText());
+        Matcher match7 = pattnum.matcher(txtqty.getText());
+        Matcher match8 = pattnum.matcher(txtbarcode.getText());
+
+        if (!match.matches() || !match1.matches() || !match2.matches() || !match3.matches() || !match4.matches() || !match5.matches() || !match6.matches() || !match7.matches() || !match8.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter All Field correctly");
+        } else {
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                pst = con1.prepareStatement("update product set product =?, description=?, cat_id=? ,brand_id=? ,cost_price=? ,retail_price=? ,qty=? ,barcode=? ,status=? where id=?");
+                pst.setString(1, product);
+                pst.setString(2, desc);
+                pst.setInt(3, citem.id);
+                pst.setInt(4, britem.id);
+                pst.setString(5, cprice);
+                pst.setString(6, rprice);
+                pst.setString(7, qty);
+                pst.setString(8, barcode);
+                pst.setString(9, status);
+                pst.setInt(10, id);
+
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Product Updated");
+                table_update();
+                txtpro.setText("");
+                txtdesc.setText("");
+                txtcat.setSelectedIndex(-1);
+                txtbrand.setSelectedIndex(-1);
+                txtqty.setText("");
+                txtcostp.setText("");
+                txtretailp.setText("");
+                txtbarcode.setText("");
+                txtStatus.setSelectedIndex(-1);
+                txtpro.requestFocus();
+
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+            } catch (SQLException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButtonCategoryEditActionPerformed
+
+    private void jButtonCategoryAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCategoryAddActionPerformed
+        // TODO add your handling code here:
+
+        String status = txtStatus.getSelectedItem().toString();
+        String product = txtpro.getText();
+        String desc = txtdesc.getText();
+        CategoryItem citem = (CategoryItem) txtcat.getSelectedItem();
+        String c = txtcat.getSelectedItem().toString();
+
+        BrandItem britem = (BrandItem) txtbrand.getSelectedItem();
+        String b = txtbrand.getSelectedItem().toString();
+        String cprice = txtcostp.getText();
+        String rprice = txtretailp.getText();
+        String qty = txtqty.getText();
+        String barcode = txtbarcode.getText();
+
+        //        validation part
+        String textPATTERN = "^[a-zA-Z,0-9, t\\xA0\\u1680\\u180e\\u2000-\\u200a\\u202f\\u205f\\u3000]{1,60}$";
+        Pattern patt = Pattern.compile(textPATTERN);
+
+        String numPATTERN = "^[0-9]{1,30}$";
+        Pattern pattnum = Pattern.compile(numPATTERN);
+
+        Matcher match = patt.matcher(txtpro.getText());
+        Matcher match1 = patt.matcher(txtdesc.getText());
+        Matcher match2 = patt.matcher(txtcat.getSelectedItem().toString());
+        Matcher match3 = patt.matcher(txtbrand.getSelectedItem().toString());
+        Matcher match4 = patt.matcher(txtStatus.getSelectedItem().toString());
+
+        Matcher match5 = pattnum.matcher(txtcostp.getText());
+        Matcher match6 = pattnum.matcher(txtretailp.getText());
+        Matcher match7 = pattnum.matcher(txtqty.getText());
+        Matcher match8 = pattnum.matcher(txtbarcode.getText());
+
+        if (!match.matches() || !match1.matches() || !match2.matches() || !match3.matches() || !match4.matches() || !match5.matches() || !match6.matches() || !match7.matches() || !match8.matches()) {
+            JOptionPane.showMessageDialog(null, "Kindly Enter All Field correctly");
+        } else {
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/superpos", "root", "my-secret-pw");
+                pst = con1.prepareStatement("insert into product (product,description, cat_id,brand_id,cost_price,retail_price,qty,barcode,status) values(?,?,?,?,?,?,?,?,?)");
+                pst.setString(1, product);
+                pst.setString(2, desc);
+                pst.setInt(3, citem.id);
+                pst.setInt(4, britem.id);
+                pst.setString(5, cprice);
+                pst.setString(6, rprice);
+                pst.setString(7, qty);
+                pst.setString(8, barcode);
+                pst.setString(9, status);
+
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Product Added");
+                table_update();
+                txtpro.setText("");
+                txtdesc.setText("");
+                txtcat.setSelectedIndex(-1);
+                txtbrand.setSelectedIndex(-1);
+                txtqty.setText("");
+                txtcostp.setText("");
+                txtretailp.setText("");
+                txtbarcode.setText("");
+                txtStatus.setSelectedIndex(-1);
+                txtpro.requestFocus();
+
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+            } catch (SQLException ex) {
+                Logger.getLogger(product.class
+                    .getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButtonCategoryAddActionPerformed
+
+    private void txtproActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtproActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtproActionPerformed
 
     /**
      * @param args the command line arguments
